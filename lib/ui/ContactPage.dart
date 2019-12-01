@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:agenda_de_contatos/helpers/ContactHelper.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ContactPage extends StatefulWidget {
   final Contact contact;
@@ -19,6 +20,7 @@ class _ContactPageState extends State<ContactPage> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _nameFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +74,15 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                   ),
                 ),
+                onTap: () {
+                  ImagePicker.pickImage(source: ImageSource.camera)
+                      .then((file) {
+                    if (file == null) return null;
+                    setState(() {
+                      _editContact.img = file.path;
+                    });
+                  });
+                },
               ),
               TextField(
                 focusNode: _nameFocus,
@@ -94,7 +105,7 @@ class _ContactPageState extends State<ContactPage> {
                 ),
                 onChanged: (text) {
                   userEditted = true;
-                  _editContact.name = text;
+                  _editContact.email = text;
                 },
                 keyboardType: TextInputType.emailAddress,
               ),

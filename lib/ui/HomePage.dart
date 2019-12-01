@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:agenda_de_contatos/helpers/ContactHelper.dart';
 import 'package:agenda_de_contatos/ui/ContactPage.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -125,7 +126,10 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.red,
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        launch("tel:${contacts[index].phone}");
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                   Padding(
