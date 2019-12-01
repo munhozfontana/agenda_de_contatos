@@ -34,82 +34,117 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.red,
-        title: Text(_editContact.name ?? "Novo Contato"),
-        centerTitle: true,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_editContact.name.isNotEmpty && _editContact.name != null) {
-            Navigator.pop(context, _editContact);
-          } else {
-            FocusScope.of(context).requestFocus(_nameFocus);
-          }
-        },
-        child: Icon(Icons.save),
-        backgroundColor: Colors.red,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            GestureDetector(
-              child: Container(
-                width: 140.0,
-                height: 140.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: _editContact.img != null
-                        ? FileImage(File(_editContact.img))
-                        : ExactAssetImage('images/userLogout.png'),
-                    fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: _requestPop,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.red,
+          title: Text(_editContact.name ?? "Novo Contato"),
+          centerTitle: true,
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            if (_editContact.name.isNotEmpty && _editContact.name != null) {
+              Navigator.pop(context, _editContact);
+            } else {
+              FocusScope.of(context).requestFocus(_nameFocus);
+            }
+          },
+          child: Icon(Icons.save),
+          backgroundColor: Colors.red,
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              GestureDetector(
+                child: Container(
+                  width: 140.0,
+                  height: 140.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: _editContact.img != null
+                          ? FileImage(File(_editContact.img))
+                          : ExactAssetImage('images/userLogout.png'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-            ),
-            TextField(
-              focusNode: _nameFocus,
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: "Nome",
+              TextField(
+                focusNode: _nameFocus,
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: "Nome",
+                ),
+                onChanged: (text) {
+                  userEditted = true;
+                  setState(() {
+                    _editContact.name = text;
+                  });
+                },
+                keyboardType: TextInputType.text,
               ),
-              onChanged: (text) {
-                userEditted = true;
-                setState(() {
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                ),
+                onChanged: (text) {
+                  userEditted = true;
                   _editContact.name = text;
-                });
-              },
-              keyboardType: TextInputType.text,
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: "Email",
+                },
+                keyboardType: TextInputType.emailAddress,
               ),
-              onChanged: (text) {
-                userEditted = true;
-                _editContact.name = text;
-              },
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: _phoneController,
-              decoration: InputDecoration(
-                labelText: "Celular",
+              TextField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  labelText: "Celular",
+                ),
+                onChanged: (text) {
+                  userEditted = true;
+                  _editContact.phone = text;
+                },
+                keyboardType: TextInputType.number,
               ),
-              onChanged: (text) {
-                userEditted = true;
-                _editContact.phone = text;
-              },
-              keyboardType: TextInputType.number,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<bool> _requestPop() {
+    if (userEditted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Descartar Alterações?"),
+            content: Text("Se sair, as alterações serão perdidas."),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text("Sim"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
   }
 }
